@@ -56,13 +56,13 @@ func TestDCT1D(t *testing.T) {
 		input  []float64
 		output []float64
 	}{
-		//{[]float64{1.0, 1.0, 1.0, 1.0}, []float64{4.0, 0, 0, 0}},
-		//{[]float64{1.0, 2.0, 3.0, 4.0}, []float64{10.0, -3.15432202989895, 0.0, -0.224170764583983}},
-		/*{
-			[]float64{0.3181653197002592, 0.39066343796185155, 0.16102608753078032},
-			[]float64{0.797356726931299, 0.275539249463622, -0.32010874738091},
-		},*/
-		{ary[3], exp[3]},
+		{[]float64{1.0, 1.0, 1.0, 1.0}, []float64{4.0, 0, 0, 0}},
+		{[]float64{1.0, 2.0, 3.0, 4.0}, []float64{10.0, -3.15432202989895, 0.0, -0.224170764583983}},
+		//{
+		//	[]float64{0.3181653197002592, 0.39066343796185155, 0.16102608753078032},
+		//	[]float64{0.797356726931299, 0.275539249463622, -0.32010874738091},
+		//},
+		//{ary[3], exp[3]},
 		{ary[4], exp[4]},
 		{ary[8], exp[8]},
 		{ary[32], exp[32]},
@@ -83,7 +83,7 @@ func TestDCT1D(t *testing.T) {
 		}
 
 		if !pass || len(tt.output) != len(out) {
-			t.Errorf("DCT1D(%v) is expected %v but got %v.", tt.input, tt.output, out)
+			t.Errorf("DCT1D(%v) expected %v but got %v.", tt.input, tt.output, out)
 		}
 	}
 }
@@ -122,6 +122,10 @@ func TestDCT2D(t *testing.T) {
 			2,
 			2,
 		},
+		{ary2d[4], exp2d[4], 4, 4},
+		{ary2d[8], exp2d[8], 8, 8},
+		{ary2d[32], exp2d[32], 32, 32},
+		{ary2d[64], exp2d[64], 64, 64},
 	} {
 		out := DCT2D(tt.input, tt.w, tt.h)
 		pass := true
@@ -135,11 +139,19 @@ func TestDCT2D(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2D(%v) is expected %v but got %v.", tt.input, tt.output, out)
+			t.Errorf("DCT2D(%d,%d,%v)\n\texpected %v\n\tbut got %v.\n", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
 
 func init() {
 	createTestData()
+}
+
+var dct [][]float64
+
+func BenchmarkDCT2D(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT2D(ary2d[32], 32, 32)
+	}
 }
