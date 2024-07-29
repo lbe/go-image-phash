@@ -163,29 +163,31 @@ func Naive_perl_dct1d(vector []float64) []float64 {
 }
 
 func Naive_perl_dct2d(vector [][]float64) [][]float64 {
-	n := len(vector)
-	fact := math.Pi / float64(n)
-	temp := make([][]float64, n)
-	result := make([][]float64, n)
-	var sum float64
+	N := len(vector)
+	factor := math.Pi / float64(N)
+	temp := make([][]float64, N)
+	result := make([][]float64, N)
 
-	for x := 0; x < n; x++ {
-		temp[x] = make([]float64, n)
-		for i := 0; i < n; i++ {
-			sum = 0
-			for j := 0; j < n; j++ {
-				sum += vector[x][j] * math.Cos((float64(j)+0.5)*float64(i)*fact)
+	for x := 0; x < N; x++ {
+		temp[x] = make([]float64, N)
+		for i := 0; i < N; i++ {
+			sum := 0.0
+			for j := 0; j < N; j++ {
+				sum += vector[x][j] * math.Cos((float64(j)+0.5)*float64(i)*factor)
 			}
 			temp[x][i] = sum
 		}
 	}
 
-	for y := 0; y < n; y++ {
-		for i := 0; i < n; i++ {
-			result[i] = make([]float64, n)
-			sum = 0
-			for j := 0; j < n; j++ {
-				sum += temp[j][y] * math.Cos((float64(j)+0.5)*float64(i)*fact)
+	for y := 0; y < N; y++ {
+		result[y] = make([]float64, N)
+	}
+
+	for y := 0; y < N; y++ {
+		for i := 0; i < N; i++ {
+			sum := 0.0
+			for j := 0; j < N; j++ {
+				sum += temp[j][y] * math.Cos((float64(j)+0.5)*float64(i)*factor)
 			}
 			result[i][y] = sum
 		}
