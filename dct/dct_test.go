@@ -264,3 +264,11 @@ func naive_dct2d(vector [][]float64) [][]float64 {
 	}
 	return result
 }
+
+var dct []float64
+
+func BenchmarkDCT_2D(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[32], 32)
+	}
+}
