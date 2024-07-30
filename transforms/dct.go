@@ -101,7 +101,7 @@ func DCT2DFast32(input *[]float64) (flattens [64]float64) {
 
 // DCT2DFast64 function returns a result of DCT2D by using the separable property.
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast64(input *[]float64) (flattens [64]float64) {
+func DCT2DFast64(input *[]float64) (flattens [64 * 64]float64) {
 	if len(*input) != 64*64 {
 		panic("incorrect input size, wanted 64x64.")
 	}
@@ -116,7 +116,7 @@ func DCT2DFast64(input *[]float64) (flattens [64]float64) {
 			row[j] = (*input)[64*j+i]
 		}
 		forwardDCT64(row[:])
-		for j := 0; j < 8; j++ {
+		for j := 0; j < 64; j++ {
 			flattens[8*j+i] = row[j]
 		}
 	}
@@ -140,7 +140,7 @@ func DCT2DFast256(input *[]float64) (flattens [256]float64) {
 			row[j] = (*input)[256*j+i]
 		}
 		forwardDCT256(row[:])
-		for j := 0; j < 16; j++ {
+		for j := 0; j < 256; j++ {
 			flattens[16*j+i] = row[j]
 		}
 	}
