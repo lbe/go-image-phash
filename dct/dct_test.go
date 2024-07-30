@@ -25,7 +25,7 @@ var (
 // function to popular above
 func createTestData() {
 	r := rand.New(rand.NewSource(99))
-	ints := []int{3, 4, 8, 11, 32, 64}
+	ints := []int{3, 4, 8, 11, 16, 32, 64, 128, 256}
 	ary = make(map[int][]float64)
 	ary2d = make(map[int][][]float64)
 	ary2d_flat = make(map[int][]float64)
@@ -138,6 +138,168 @@ func TestDCT_2D(t *testing.T) {
 
 		if !pass {
 			t.Errorf("DCT_2D(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast8(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[8], exp2d[8], 8, 8},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast8(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast8(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast16(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[16], exp2d[16], 16, 16},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast16(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast16(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast32(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[32], exp2d[32], 32, 32},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast32(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast32(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast64(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[64], exp2d[64], 64, 64},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast64(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast64(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast128(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[128], exp2d[128], 128, 128},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast128(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast128(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+func TestDCT2DFast256(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[256], exp2d[256], 256, 256},
+	} {
+		flat_in := flatten(tt.input)
+		out := DCT2DFast256(flat_in)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast256(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -267,8 +429,74 @@ func naive_dct2d(vector [][]float64) [][]float64 {
 
 var dct []float64
 
-func BenchmarkDCT_2D(b *testing.B) {
+func BenchmarkDCT_2D_8(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[8], 8)
+	}
+}
+
+func BenchmarkDCT_2D_16(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[16], 16)
+	}
+}
+
+func BenchmarkDCT_2D_32(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		dct = DCT_2D(ary2d_flat[32], 32)
+	}
+}
+
+func BenchmarkDCT_2D_64(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[64], 64)
+	}
+}
+
+func BenchmarkDCT_2D_128(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[128], 128)
+	}
+}
+
+func BenchmarkDCT_2D_256(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dct = DCT_2D(ary2d_flat[256], 256)
+	}
+}
+
+func BenchmarkDCT2DFast8(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast8(ary2d_flat[8])
+	}
+}
+
+func BenchmarkDCT2DFast16(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast16(ary2d_flat[16])
+	}
+}
+
+func BenchmarkDCT2DFast32(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast32(ary2d_flat[32])
+	}
+}
+
+func BenchmarkDCT2DFast64(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast64(ary2d_flat[64])
+	}
+}
+
+func BenchmarkDCT2DFast128(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast128(ary2d_flat[128])
+	}
+}
+
+func BenchmarkDCT2DFast256(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = DCT2DFast256(ary2d_flat[256])
 	}
 }
