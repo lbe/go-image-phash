@@ -91,6 +91,31 @@ func DCT_2D(input []float64, sz int) []float64 {
 		return result
 	}
 
+	if sz == 16 {
+		r := DCT2DFast16(result)
+		return []float64(r[:])
+	}
+
+	if sz == 32 {
+		r := DCT2DFast32(result)
+		return []float64(r[:])
+	}
+
+	if sz == 64 {
+		r := DCT2DFast64(result)
+		return []float64(r[:])
+	}
+
+	if sz == 128 {
+		r := DCT2DFast128(result)
+		return []float64(r[:])
+	}
+
+	if sz == 256 {
+		r := DCT2DFast256(result)
+		return []float64(r[:])
+	}
+
 	if (sz & (sz - 1)) == 0 { // power of 2
 		fast_dct_2d(result, sz) // Lee
 		return result
@@ -135,7 +160,7 @@ func DCT2DFast8(input []float64) (flattens [8 * 8]float64) {
 			flattens[8*j+i] = row[j]
 		}
 	}
-	return
+	return flattens
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
