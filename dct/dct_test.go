@@ -137,7 +137,7 @@ func TestDCT_2D(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT_2D(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT_2D(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -164,7 +164,7 @@ func TestDCT2DFast8(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2DFast8(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT2DFast8(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -191,7 +191,7 @@ func TestDCT2DFast16(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2DFast16(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT2DFast16(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -218,7 +218,7 @@ func TestDCT2DFast32(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2DFast32(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT2DFast32(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -272,7 +272,7 @@ func TestDCT2DFast128(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2DFast128(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT2DFast128(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
@@ -299,7 +299,7 @@ func TestDCT2DFast256(t *testing.T) {
 		}
 
 		if !pass {
-			t.Errorf("DCT2DFast256(%d, %d, %v) expected %v but got %v.", tt.w, tt.h, tt.input, tt.output, out)
+			t.Errorf("DCT2DFast266(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
 		}
 	}
 }
