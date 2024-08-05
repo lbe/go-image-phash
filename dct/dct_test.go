@@ -25,7 +25,7 @@ var (
 // function to popular above
 func createTestData() {
 	r := rand.New(rand.NewSource(99))
-	ints := []int{3, 4, 8, 11, 16, 32, 64, 128, 256}
+	ints := []int{3, 4, 8, 11, 16, 32, 64, 128, 256, 512}
 	ary = make(map[int][]float64)
 	ary2d = make(map[int][][]float64)
 	ary2d_flat = make(map[int][]float64)
@@ -59,6 +59,9 @@ func TestDCT_1D(t *testing.T) {
 		{ary[11], exp[11]},
 		{ary[32], exp[32]},
 		{ary[64], exp[64]},
+		{ary[128], exp[128]},
+		{ary[256], exp[256]},
+		{ary[512], exp[512]},
 	} {
 		out := DCT_1D(tt.input, len(tt.input))
 		pass := true
@@ -90,6 +93,9 @@ func TestIDCT_1D(t *testing.T) {
 		{ary[11], exp[11]},
 		{ary[32], exp[32]},
 		{ary[64], exp[64]},
+		{ary[128], exp[128]},
+		{ary[256], exp[256]},
+		{ary[512], exp[512]},
 	} {
 		in := IDCT_1D(tt.output, len(tt.output))
 		pass := true
@@ -123,9 +129,13 @@ func TestDCT_2D(t *testing.T) {
 		{ary2d[11], exp2d[11], 11, 11},
 		{ary2d[32], exp2d[32], 32, 32},
 		{ary2d[64], exp2d[64], 64, 64},
+		{ary2d[128], exp2d[128], 128, 128},
+		{ary2d[256], exp2d[256], 256, 256},
+		{ary2d[512], exp2d[512], 512, 512},
 	} {
 		flat_in := flatten(tt.input)
-		out := DCT_2D(flat_in, tt.w)
+		out := make([]float64, tt.w*tt.h)
+		DCT_2D(&flat_in, tt.w, &out)
 		pass := true
 
 		for i := 0; i < tt.w; i++ {
@@ -142,6 +152,7 @@ func TestDCT_2D(t *testing.T) {
 	}
 }
 
+/*
 func TestDCT2DFast8(t *testing.T) {
 	for _, tt := range []struct {
 		input  [][]float64
@@ -152,7 +163,37 @@ func TestDCT2DFast8(t *testing.T) {
 		{ary2d[8], exp2d[8], 8, 8},
 	} {
 		flat_in := flatten(tt.input)
-		out := DCT2DFast8(flat_in)
+		out := make([]float64, 8*8)
+		DCT2DFast8(flat_in, out)
+		pass := true
+
+		for i := 0; i < tt.w; i++ {
+			for j := 0; j < tt.h; j++ {
+				if math.Abs(out[i*tt.w+j]-tt.output[i][j]) > EPSILON {
+					pass = false
+				}
+			}
+		}
+
+		if !pass {
+			t.Errorf("DCT2DFast8(%d, %d, %v)\n\texpected %v\n\n\tbut got %v.", tt.w, tt.h, tt.input, tt.output, out)
+		}
+	}
+}
+
+
+func TestDCT2DFastN8(t *testing.T) {
+	for _, tt := range []struct {
+		input  [][]float64
+		output [][]float64
+		w      int
+		h      int
+	}{
+		{ary2d[8], exp2d[8], 8, 8},
+	} {
+		flat_in := flatten(tt.input)
+		out := make([]float64, 8*8)
+		DCT2DFastN(8, flat_in, out)
 		pass := true
 
 		for i := 0; i < tt.w; i++ {
@@ -303,6 +344,7 @@ func TestDCT2DFast256(t *testing.T) {
 		}
 	}
 }
+*/
 
 func TestIDCT_2D(t *testing.T) {
 	for _, tt := range []struct {
@@ -317,6 +359,9 @@ func TestIDCT_2D(t *testing.T) {
 		{ary2d[11], exp2d[11], 11, 11},
 		{ary2d[32], exp2d[32], 32, 32},
 		{ary2d[64], exp2d[64], 64, 64},
+		{ary2d[128], exp2d[128], 128, 128},
+		{ary2d[256], exp2d[256], 256, 256},
+		{ary2d[512], exp2d[512], 512, 512},
 	} {
 		flat_out := flatten(tt.output)
 		in := IDCT_2D(flat_out, tt.w)
@@ -429,74 +474,190 @@ func naive_dct2d(vector [][]float64) [][]float64 {
 
 var dct []float64
 
-func BenchmarkDCT_2D_8(b *testing.B) {
+func BenchmarkDCT_2D_3(b *testing.B) {
+	input := ary2d_flat[3]
+	result := make([]float64, 3*3)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[8], 8)
+		DCT_2D(&input, 3, &result)
+	}
+}
+
+func BenchmarkDCT_2D_8(b *testing.B) {
+	input := ary2d_flat[8]
+	result := input //make([]float64, 8*8)
+	for i := 0; i < b.N; i++ {
+		DCT_2D(&input, 8, &result)
+	}
+}
+
+func BenchmarkDCT_2D_11(b *testing.B) {
+	input := ary2d_flat[11]
+	result := make([]float64, 11*11)
+	for i := 0; i < b.N; i++ {
+		DCT_2D(&input, 11, &result)
 	}
 }
 
 func BenchmarkDCT_2D_16(b *testing.B) {
+	input := ary2d_flat[16]
+	result := make([]float64, 16*16)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[16], 16)
+		DCT_2D(&input, 16, &result)
 	}
 }
 
 func BenchmarkDCT_2D_32(b *testing.B) {
+	input := ary2d_flat[32]
+	result := make([]float64, 32*32)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[32], 32)
+		DCT_2D(&input, 32, &result)
 	}
 }
 
 func BenchmarkDCT_2D_64(b *testing.B) {
+	input := ary2d_flat[64]
+	result := make([]float64, 64*64)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[64], 64)
+		DCT_2D(&input, 64, &result)
 	}
 }
 
 func BenchmarkDCT_2D_128(b *testing.B) {
+	input := ary2d_flat[128]
+	result := make([]float64, 128*128)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[128], 128)
+		DCT_2D(&input, 128, &result)
 	}
 }
 
 func BenchmarkDCT_2D_256(b *testing.B) {
+	input := ary2d_flat[256]
+	result := make([]float64, 256*256)
 	for i := 0; i < b.N; i++ {
-		dct = DCT_2D(ary2d_flat[256], 256)
+		DCT_2D(&input, 256, &result)
 	}
 }
 
+func BenchmarkDCT_2D_512(b *testing.B) {
+	input := ary2d_flat[512]
+	result := make([]float64, 512*512)
+	for i := 0; i < b.N; i++ {
+		DCT_2D(&input, 512, &result)
+	}
+}
+
+func BenchmarkFct8_2d(b *testing.B) {
+	result := make([]float64, 8*8)
+	for i := 0; i < b.N; i++ {
+		result = ary2d_flat[8]
+		fct8_2d(result)
+	}
+}
+
+/*
 func BenchmarkDCT2DFast8(b *testing.B) {
+	out := make([]float64, 8*8)
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast8(ary2d_flat[8])
+		DCT2DFast8(ary2d_flat[8], out)
 	}
 }
-
 func BenchmarkDCT2DFast16(b *testing.B) {
+	input := ary2d_flat[16]
+	result := make([]float64, 16*16)
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast16(ary2d_flat[16])
+		DCT2DFast16(&input, &result)
 	}
 }
 
 func BenchmarkDCT2DFast32(b *testing.B) {
+	input := ary2d_flat[32]
+	result := make([]float64, 32*32)
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast32(ary2d_flat[32])
+		DCT2DFast32(&input, &result)
 	}
 }
 
 func BenchmarkDCT2DFast64(b *testing.B) {
+	input := ary2d_flat[64]
+	result := make([]float64, 64*64)
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast64(ary2d_flat[64])
+		DCT2DFast64(&input, &result)
 	}
 }
 
 func BenchmarkDCT2DFast128(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast128(ary2d_flat[128])
+		DCT2DFast128(&input, &result)
 	}
 }
 
 func BenchmarkDCT2DFast256(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = DCT2DFast256(ary2d_flat[256])
+		DCT2DFast256(&input, &result)
+	}
+}
+*/
+
+func BenchmarkDCT2DFastN4(b *testing.B) {
+	input := ary2d_flat[4]
+	result := make([]float64, 4*4)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(4, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN8(b *testing.B) {
+	input := ary2d_flat[8]
+	result := make([]float64, 8*8)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(8, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN16(b *testing.B) {
+	input := ary2d_flat[16]
+	result := make([]float64, 16*16)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(16, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN32(b *testing.B) {
+	input := ary2d_flat[32]
+	result := make([]float64, 32*32)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(32, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN64(b *testing.B) {
+	input := ary2d_flat[64]
+	result := make([]float64, 64*64)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(64, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN128(b *testing.B) {
+	input := ary2d_flat[128]
+	result := make([]float64, 128*128)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(128, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastN256(b *testing.B) {
+	input := ary2d_flat[256]
+	result := make([]float64, 256*256)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastN(256, &input, &result)
+	}
+}
+
+func BenchmarkDCT2DFastNBig512(b *testing.B) {
+	input := ary2d_flat[512]
+	result := make([]float64, 512*512)
+	for i := 0; i < b.N; i++ {
+		DCT2DFastNBig(512, &input, &result)
 	}
 }

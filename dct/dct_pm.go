@@ -2,6 +2,7 @@ package dct
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"slices"
 )
@@ -80,49 +81,66 @@ func IDCT_1D(input []float64, sz int) []float64 {
 	return result
 }
 
-func DCT_2D(input []float64, sz int) []float64 {
+func DCT_2D(input *[]float64, sz int, result *[]float64) {
 	if sz == 0 {
-		sz = int(math.Sqrt(float64(len(input))))
+		sz = int(math.Sqrt(float64(len(*input))))
 	}
 
-	result := slices.Clone(input)
-	if sz == 8 {
-		fct8_2d(result) // Arai, Agui, Nakajima
-		return result
+	switch {
+	case sz == 8:
+		{
+			*result = *input
+			fct8_2d(*result) // Arai, Agui, Nakajima
+			//return result
+		}
+		/*
+			case sz == 16:
+				{
+					r := DCT2DFast16(input, result)
+					//return []float64(r[:])
+				}
+			case sz == 32:
+				{
+					r := DCT2DFast32(result)
+					return []float64(r[:])
+				}
+			case sz == 64:
+				{
+					r := DCT2DFast64(result)
+					return []float64(r[:])
+				}
+			case sz == 128:
+				{
+					r := DCT2DFast128(result)
+					return []float64(r[:])
+				}
+			case sz == 256:
+				{
+					r := DCT2DFast256(result)
+					return []float64(r[:])
+				}
+		*/
+	case sz < 512 && (sz&(sz-1)) == 0:
+		{ // power of 2
+			//*result = *input
+			//fast_dct_2d(*result, sz) // Lee
+			DCT2DFastN(sz, input, result)
+			//return                   //result
+		}
+	case (sz & (sz - 1)) == 0:
+		{ // power of 2
+			//*result = *input
+			//fast_dct_2d(*result, sz) // Lee
+			DCT2DFastNBig(sz, input, result)
+		}
+	default:
+		{
+			*result = *input
+			dct_2d(*result, sz)
+			//return //result
+		}
 	}
-
-	if sz == 16 {
-		r := DCT2DFast16(result)
-		return []float64(r[:])
-	}
-
-	if sz == 32 {
-		r := DCT2DFast32(result)
-		return []float64(r[:])
-	}
-
-	if sz == 64 {
-		r := DCT2DFast64(result)
-		return []float64(r[:])
-	}
-
-	if sz == 128 {
-		r := DCT2DFast128(result)
-		return []float64(r[:])
-	}
-
-	if sz == 256 {
-		r := DCT2DFast256(result)
-		return []float64(r[:])
-	}
-
-	if (sz & (sz - 1)) == 0 { // power of 2
-		fast_dct_2d(result, sz) // Lee
-		return result
-	}
-
-	dct_2d(result, sz)
-	return result
+	return
 }
 
 func IDCT_2D(input []float64, sz int) []float64 {
@@ -140,54 +158,54 @@ func IDCT_2D(input []float64, sz int) []float64 {
 	return result
 }
 
+/*
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast8(input []float64) (flattens [8 * 8]float64) {
-	if len(input) != 8*8 {
+func DCT2DFast8(input *[]float64, flattens *[]float64) {
+	if len(*input) != 8*8 {
 		panic("incorrect input size, wanted 8x8.")
 	}
 
 	for i := 0; i < 8; i++ { // height
-		transformDCT8((input)[i*8 : (i*8)+8])
+		transformDCT8((*input)[i*8 : (i*8)+8])
 	}
 
 	var row [8]float64
 	for i := 0; i < 8; i++ { // width
 		for j := 0; j < 8; j++ {
-			row[j] = (input)[8*j+i]
+			row[j] = (*input)[8*j+i]
 		}
 		transformDCT8(row[:])
 		for j := 0; j < 8; j++ {
-			flattens[8*j+i] = row[j]
+			(*flattens)[8*j+i] = row[j]
 		}
 	}
-	return flattens
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast16(input []float64) (flattens [16 * 16]float64) {
-	if len(input) != 16*16 {
+func DCT2DFast16(input *[]float64, flattens *[]float64) {
+	if len(*input) != 16*16 {
 		panic("incorrect input size, wanted 16x16.")
 	}
 
 	for i := 0; i < 16; i++ { // height
-		transformDCT16((input)[i*16 : (i*16)+16])
+		transformDCT16((*input)[i*16 : (i*16)+16])
 	}
 
 	var row [16]float64
 	for i := 0; i < 16; i++ { // width
 		for j := 0; j < 16; j++ {
-			row[j] = (input)[16*j+i]
+			row[j] = (*input)[16*j+i]
 		}
 		transformDCT16(row[:])
 		for j := 0; j < 16; j++ {
-			flattens[16*j+i] = row[j]
+			(*flattens)[16*j+i] = row[j]
 		}
 	}
 	return
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast32(input []float64) (flattens [32 * 32]float64) {
+func DCT2DFast32(input []float64, flattens *[]float64) {
 	if len(input) != 32*32 {
 		panic("incorrect input size, wanted 32x32.")
 	}
@@ -203,14 +221,14 @@ func DCT2DFast32(input []float64) (flattens [32 * 32]float64) {
 		}
 		transformDCT32(row[:])
 		for j := 0; j < 32; j++ {
-			flattens[32*j+i] = row[j]
+			(*flattens)[32*j+i] = row[j]
 		}
 	}
 	return
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast64(input []float64) (flattens [4096]float64) {
+func DCT2DFast64(input []float64, flattens *[]float64) {
 	if len(input) != 64*64 {
 		panic("incorrect input size, wanted 64x64.")
 	}
@@ -226,14 +244,14 @@ func DCT2DFast64(input []float64) (flattens [4096]float64) {
 		}
 		transformDCT64(row[:])
 		for j := 0; j < 64; j++ {
-			flattens[64*j+i] = row[j]
+			(*flattens)[64*j+i] = row[j]
 		}
 	}
 	return
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast128(input []float64) (flattens [128 * 128]float64) {
+func DCT2DFast128(input []float64, flattens *[]float64) {
 	if len(input) != 128*128 {
 		panic("incorrect input size, wanted 128x128.")
 	}
@@ -249,14 +267,14 @@ func DCT2DFast128(input []float64) (flattens [128 * 128]float64) {
 		}
 		transformDCT128(row[:])
 		for j := 0; j < 128; j++ {
-			flattens[128*j+i] = row[j]
+			(*flattens)[128*j+i] = row[j]
 		}
 	}
 	return
 }
 
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
-func DCT2DFast256(input []float64) (flattens [256 * 256]float64) {
+func DCT2DFast256(input []float64, flattens *[]float64) {
 	if len(input) != 256*256 {
 		panic("incorrect input size, wanted 256x256.")
 	}
@@ -272,10 +290,55 @@ func DCT2DFast256(input []float64) (flattens [256 * 256]float64) {
 		}
 		transformDCT256(row[:])
 		for j := 0; j < 256; j++ {
-			flattens[256*j+i] = row[j]
+			(*flattens)[256*j+i] = row[j]
 		}
 	}
 	return
+}
+*/
+
+// Fast uses static DCT tables for improved performance. Returns flattened pixels.
+func DCT2DFastN(N int, input *[]float64, flattens *[]float64) {
+	if (N < 4) && (N&(N-1) != 0) {
+		panic(fmt.Sprintf("transformDCTN N = %d is not a power of 2 or is < 4", N))
+	}
+
+	for i := 0; i < N; i++ { // height
+		transformDCTN(N, (*input)[i*N:(i*N)+N])
+	}
+
+	row := make([]float64, N)
+	for i := 0; i < N; i++ { // width
+		for j := 0; j < N; j++ {
+			row[j] = (*input)[N*j+i]
+		}
+		transformDCTN(N, row)
+		for j := 0; j < N; j++ {
+			(*flattens)[N*j+i] = row[j]
+		}
+	}
+}
+
+// Fast uses static DCT tables for improved performance. Returns flattened pixels.
+func DCT2DFastNBig(N int, input *[]float64, flattens *[]float64) {
+	if (N < 4) && (N&(N-1) != 0) {
+		panic(fmt.Sprintf("transformDCTN N = %d is not a power of 2 or is < 4", N))
+	}
+
+	for i := 0; i < N; i++ { // height
+		transformDCTNBig(N, (*input)[i*N:(i*N)+N])
+	}
+
+	row := make([]float64, N)
+	for i := 0; i < N; i++ { // width
+		for j := 0; j < N; j++ {
+			row[j] = (*input)[N*j+i]
+		}
+		transformDCTNBig(N, row)
+		for j := 0; j < N; j++ {
+			(*flattens)[N*j+i] = row[j]
+		}
+	}
 }
 
 // flatten [][] to [] to match convention ported from perl Math::DCT

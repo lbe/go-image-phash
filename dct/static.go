@@ -1,5 +1,100 @@
 package dct
 
+import (
+	"math"
+	"sync"
+
+	"github.com/alphadose/haxmap"
+)
+
+// Static DCT Tables
+// var dctN map[int][]float64
+var dctN *haxmap.Map[int, []float64]
+
+var temp512Float64Pool = sync.Pool{
+	New: func() any {
+		var a [512]float64
+		return &a
+	},
+}
+
+func transformDCTN(N int, input []float64) {
+	if N == 4 {
+		transformDCT4(input)
+		return
+	}
+	// fmt.Printf("DCTN[%d] = %v\n", N, dctN[N])
+	// fmt.Printf("transformDCTN N = %d, input len = %d\n%v\n", N, len(input), input)
+	half := N / 2
+	// temp := make([]float64, N)
+	// var temp [512]float64
+	temp := temp512Float64Pool.Get().(*[512]float64)
+	dct, ok := dctN.Get(N)
+	if !ok {
+		panic("transformDCTN dct not retrieved")
+	}
+
+	for i := 0; i < half; i++ {
+		// fmt.Printf("\ti = %d\n%v\n", i, temp)
+		x, y := input[i], input[N-1-i]
+		(*temp)[i] = x + y
+		(*temp)[i+half] = (x - y) / dct[i]
+	}
+	transformDCTN(half, (*temp)[:half])
+	transformDCTN(half, (*temp)[half:])
+	for i := 0; i < half-1; i++ {
+		input[i*2+0] = (*temp)[i]
+		input[i*2+1] = (*temp)[i+half] + (*temp)[i+half+1]
+	}
+	input[N-2], input[N-1] = (*temp)[half-1], (*temp)[N-1]
+	temp512Float64Pool.Put(temp)
+}
+
+func transformDCTNBig(N int, input []float64) {
+	if N < 512 {
+		/*switch N {
+		case 4:
+			transformDCT4(input)
+		case 8:
+			transformDCT8(input)
+		case 16:
+			transformDCT16(input)
+		case 32:
+			transformDCT32(input)
+		case 64:
+			transformDCT64(input)
+		case 128:
+			transformDCT128(input)
+		case 256:*/
+		transformDCT256(input)
+		//}
+		return
+	}
+	half := N / 2
+	temp := make([]float64, N)
+	dct, ok := dctN.Get(N)
+	if !ok {
+		dct = make([]float64, half)
+		for i := 0; i < half; i++ {
+			dct[i] = (math.Cos((float64(i)+0.5)*math.Pi/float64(N)) * 2)
+		}
+		dctN.Set(N, dct)
+	}
+
+	for i := 0; i < half; i++ {
+		x, y := input[i], input[N-1-i]
+		temp[i] = x + y
+		temp[i+half] = (x - y) / dct[i]
+	}
+	transformDCTN(half, temp[:half])
+	transformDCTN(half, temp[half:])
+	for i := 0; i < half-1; i++ {
+		input[i*2+0] = temp[i]
+		input[i*2+1] = temp[i+half] + temp[i+half+1]
+	}
+	input[N-2], input[N-1] = temp[half-1], temp[N-1]
+}
+
 func transformDCT256(input []float64) {
 	var temp [256]float64
 	for i := 0; i < 128; i++ {
@@ -185,3 +280,16 @@ var (
 		1.9903694533443936, 1.9138806714644176, 1.76384252869671, 1.546020906725474, 1.2687865683272912, 0.9427934736519956, 0.5805693545089246, 0.19603428065912154,
 	}
 )
+
+func init() {
+	// dctN = make(map[int][]float64)
+	dctN = haxmap.New[int, []float64]()
+	for n := 1; n < 512; n *= 2 {
+		dct := make([]float64, n/2)
+		for i := 0; i < n/2; i++ {
+			dct[i] = (math.Cos((float64(i)+0.5)*math.Pi/float64(n)) * 2)
+		}
+		// fmt.Printf("dctN[%d] = %v\n\n\n", n/2, dctN[n])
+		dctN.Set(n, dct)
+	}
+}
