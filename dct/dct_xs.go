@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func fct8_1d( /*inbuf []byte*/ vector []float64) {
+func FDCT8_1D( /*inbuf []byte*/ vector []float64) {
 	v0 := vector[0] + vector[7]
 	v1 := vector[1] + vector[6]
 	v2 := vector[2] + vector[5]
@@ -50,11 +50,11 @@ func fct8_1d( /*inbuf []byte*/ vector []float64) {
 	vector[7] = 2.5629154477415022505 * v27
 }
 
-func fct8_2d(inbuf []float64) {
+func FDCT8_2D(inbuf []float64) {
 	temp := make([]float64, 64)
 
 	for x := 0; x < 64; x += 8 {
-		fct8_1d(inbuf[x : x+8])
+		FDCT8_1D(inbuf[x : x+8])
 	}
 
 	for x := 0; x < 8; x++ {
@@ -64,7 +64,7 @@ func fct8_2d(inbuf []float64) {
 	}
 
 	for y := 0; y < 64; y += 8 {
-		fct8_1d(temp[y : y+8])
+		FDCT8_1D(temp[y : y+8])
 	}
 
 	for x := 0; x < 8; x++ {

@@ -546,10 +546,10 @@ func BenchmarkDCT_2D_512(b *testing.B) {
 	}
 }
 
-func BenchmarkFct8_2d(b *testing.B) {
+func BenchmarkFDCT8_2D(b *testing.B) {
 	result := make([]float64, 8*8)
 	for i := 0; i < b.N; i++ {
 		result = ary2d_flat[8]
-		fct8_2d(result)
+		FDCT8_2D(result)
 	}
 }

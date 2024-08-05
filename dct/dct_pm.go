@@ -27,7 +27,7 @@ func DCT(vector [][]float64) ([][]float64, error) {
 
 	if dim > 1 {
 		if sz == 8 {
-			fct8_2d(pack)
+			FDCT8_2D(pack)
 		} else if (sz & (sz - 1)) == 0 {
 			fast_dct_2d(pack, sz)
 		} else {
@@ -35,7 +35,7 @@ func DCT(vector [][]float64) ([][]float64, error) {
 		}
 	} else {
 		if sz == 8 {
-			fct8_1d(pack)
+			FDCT8_1D(pack)
 		} else if (sz & (sz - 1)) == 0 {
 			fast_dct_1d(pack, sz)
 		} else {
@@ -60,7 +60,7 @@ func DCT_1D(input []float64, sz int) []float64 {
 	result := slices.Clone(input)
 
 	if sz == 8 {
-		fct8_1d(result)
+		FDCT8_1D(result)
 		return result
 	}
 
@@ -90,7 +90,7 @@ func DCT_2D(input *[]float64, sz int, result *[]float64) {
 	case sz == 8:
 		{
 			*result = *input
-			fct8_2d(*result) // Arai, Agui, Nakajima
+			FDCT8_2D(*result) // Arai, Agui, Nakajima
 		}
 	case sz < 512 && (sz&(sz-1)) == 0: // power of 2
 		DCT2DFastN(sz, input, result)
