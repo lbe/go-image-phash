@@ -102,7 +102,6 @@ func DCT_2D(input *[]float64, sz int, result *[]float64) {
 			dct_2d(*result, sz)
 		}
 	}
-	return
 }
 
 func IDCT_2D(input []float64, sz int) []float64 {
@@ -119,7 +118,7 @@ func IDCT_2D(input []float64, sz int) []float64 {
 // Fast uses static DCT tables for improved performance. Returns flattened pixels.
 func DCT2DFastN(N int, input *[]float64, flattens *[]float64) {
 	if (N < 4) && (N&(N-1) != 0) {
-		panic(fmt.Sprintf("transformDCTN N = %d is not a power of 2 or is < 4", N))
+		panic(fmt.Sprintf("DCT2DFastN = %d is not a power of 2 or is < 4", N))
 	}
 
 	for i := 0; i < N; i++ { // height

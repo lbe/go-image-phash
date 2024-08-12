@@ -472,7 +472,7 @@ func naive_dct2d(vector [][]float64) [][]float64 {
 	return result
 }
 
-var dct []float64
+//var dct []float64
 
 func BenchmarkDCT_2D_3(b *testing.B) {
 	input := ary2d_flat[3]
@@ -548,6 +548,7 @@ func BenchmarkDCT_2D_512(b *testing.B) {
 
 func BenchmarkFDCT8_2D(b *testing.B) {
 	result := make([]float64, 8*8)
+	_ = result
 	for i := 0; i < b.N; i++ {
 		result = ary2d_flat[8]
 		FDCT8_2D(result)
