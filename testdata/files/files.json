@@ -1,0 +1,17 @@
+{
+   "about" : "Stable file-level hash goldens for the checked-in _examples images under the Go pipeline. Each hash is PHash(Options{}) of a PHash loaded from the image file via NewFromPath with empty/zero Options — Image::PHash 0.3 defaults (resize 32, geometry 8x8, method average) — through the Go ApproxBiLinear resize + luminance + DCT pipeline (jpeg decode registered by the phash package). These goldens are Go-pipeline-derived, not copied from Perl: the Go ApproxBiLinear resize produces different 32x32 pixels than Image::PHash 0.3's Imager 'mixing' resize for images larger than 32x32, so the file-level hashes differ from Perl (only the already-32x32 M31_th.jpg matches, D39F36E74DFB6D9F), and the similar-pair distance thresholds asserted by phash/files_test.go are measured from this same Go pipeline instead of t/phash.t.",
+   "settings" : {
+      "resize" : 32,
+      "geometry" : "8x8",
+      "method" : "average",
+      "mirror" : false,
+      "mirrorproof" : false
+   },
+   "hashes" : {
+      "M31.jpg" : "8B9F36EF4D5B799F",
+      "M31_mirr.jpg" : "D7CF67B3196F3CCF",
+      "M31_s.jpg" : "939A376F4D5A6DDB",
+      "M31_th.jpg" : "D39F36E74DFB6D9F",
+      "SolarEclipse.jpg" : "D67F2D9D636D98C3"
+   }
+}

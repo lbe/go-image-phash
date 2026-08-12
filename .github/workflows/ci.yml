@@ -1,0 +1,104 @@
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  lint-and-format:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.5"
+          cache: true
+
+      - name: Verify Go version
+        run: go version
+
+      - name: Install format tools
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          mkdir -p "$HOME/.local/bin"
+          gh release download v2.5.0 --repo numtide/treefmt --pattern 'treefmt_*_linux_amd64.tar.gz' --dir /tmp/treefmt
+          tar -xzf /tmp/treefmt/treefmt_*.tar.gz -C "$HOME/.local/bin" treefmt
+          gh release download 0.55.2 --repo dprint/dprint --pattern 'dprint-x86_64-unknown-linux-gnu.zip' --dir /tmp/dprint
+          unzip -o /tmp/dprint/dprint-x86_64-unknown-linux-gnu.zip -d "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.10.1
+          args: --timeout=5m
+          install-mode: binary
+
+      - name: Run format check
+        run: make -C ${{ github.workspace }} format-check
+
+      - name: Build all packages
+        run: go build -v ./...
+
+      - name: Build phash CLI
+        run: go build -v -o bin/phash ./cmd/phash
+
+      - name: Run tests (coverage)
+        run: make -C ${{ github.workspace }} cover
+
+      - name: Upload coverage (Codecov)
+        uses: codecov/codecov-action@v7
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  test:
+    name: Test (${{ matrix.platform }})
+    needs: lint-and-format
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-amd64
+            runner: ubuntu-latest
+          - platform: linux-arm64
+            runner: ubuntu-24.04-arm
+          - platform: macos-amd64
+            runner: macos-15-intel
+          - platform: macos-arm64
+            runner: macos-latest
+          - platform: windows-amd64
+            runner: windows-latest
+          - platform: windows-arm64
+            runner: windows-11-arm
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.5"
+          cache: true
+
+      - name: Verify Go version
+        run: go version
+
+      - name: Run tests
+        run: go test -count=1 ./...
+
+      - name: Build all packages
+        run: go build -v ./...
+
+      - name: Build phash CLI (Unix)
+        if: runner.os != 'Windows'
+        run: go build -v -o bin/phash ./cmd/phash
+
+      - name: Build phash CLI (Windows)
+        if: runner.os == 'Windows'
+        run: go build -v -o bin/phash.exe ./cmd/phash
