@@ -324,7 +324,7 @@ make bench      # dct, gensyncpool, and phash benchmarks
 ```
 
 Recorded numbers for the current toolchain live in [`docs/benchmarks.txt`](docs/benchmarks.txt).
-Regenerate after a Go upgrade with `make bench-update`.
+`make bench` runs benchmarks and updates that file via `tee`.
 
 With Perl and Image::PHash 0.3 available, `go test -tags=perl ./...` checks
 DCT, luminance hashes, the bit pipeline, `b2h`, and `diff` against the live

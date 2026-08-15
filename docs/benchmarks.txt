@@ -1,44 +1,45 @@
 goos: linux
 goarch: amd64
-go: go1.26.5
+go: go1.27.0
 cpu: Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz
 
 goos: linux
 goarch: amd64
 pkg: github.com/lbe/go-image-phash/dct
 cpu: Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz
-BenchmarkDCT_2D_3-24      	  947755	      1094 ns/op	     232 B/op	       5 allocs/op
-BenchmarkDCT_2D_8-24      	 2591286	       406.9 ns/op	       0 B/op	       0 allocs/op
-BenchmarkDCT_2D_11-24     	   70098	     16120 ns/op	    2368 B/op	      13 allocs/op
-BenchmarkDCT_2D_16-24     	   96687	     13105 ns/op	     128 B/op	       1 allocs/op
-BenchmarkDCT_2D_32-24     	   19486	     52967 ns/op	     256 B/op	       1 allocs/op
-BenchmarkDCT_2D_64-24     	    4161	    257463 ns/op	     513 B/op	       1 allocs/op
-BenchmarkDCT_2D_128-24    	    1041	   1332919 ns/op	    1153 B/op	       1 allocs/op
-BenchmarkDCT_2D_256-24    	     168	   6169663 ns/op	    5213 B/op	       1 allocs/op
-BenchmarkDCT_2D_512-24    	      20	  51979128 ns/op	 4305892 B/op	    1028 allocs/op
-BenchmarkFDCT8_2D-24      	 2688633	       384.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDCT_2D_3-24      	 1000000	      1018 ns/op	     232 B/op	       5 allocs/op
+BenchmarkDCT_2D_8-24      	 3448508	       372.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDCT_2D_11-24     	   84636	     15475 ns/op	    2368 B/op	      13 allocs/op
+BenchmarkDCT_2D_16-24     	   99870	     10450 ns/op	     128 B/op	       1 allocs/op
+BenchmarkDCT_2D_32-24     	   18375	     54569 ns/op	     256 B/op	       1 allocs/op
+BenchmarkDCT_2D_64-24     	    5857	    236746 ns/op	     513 B/op	       1 allocs/op
+BenchmarkDCT_2D_128-24    	     957	   1178323 ns/op	    1168 B/op	       1 allocs/op
+BenchmarkDCT_2D_256-24    	     157	   7427384 ns/op	    5435 B/op	       1 allocs/op
+BenchmarkDCT_2D_512-24    	      33	  50211650 ns/op	 4264496 B/op	    1028 allocs/op
+BenchmarkFDCT8_2D-24      	 2591275	       402.2 ns/op	       0 B/op	       0 allocs/op
 PASS
-ok  	github.com/lbe/go-image-phash/dct	23.830s
+ok  	github.com/lbe/go-image-phash/dct	25.517s
 goos: linux
 goarch: amd64
 pkg: github.com/lbe/go-image-phash/internal/gensyncpool
 cpu: Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz
-BenchmarkGenSyncPool_Get-24            	48633445	        23.67 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGenSyncPool_NewAlloc-24       	18964548	        61.28 ns/op	      16 B/op	       1 allocs/op
-BenchmarkGenSyncPool_BytesBuffer-24    	34454349	        30.88 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGenSyncPool_NullString-24     	44437012	        23.50 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGenSyncPool_NullInt64-24      	46694926	        24.37 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGenSyncPool_MD5-24            	 2124248	       557.3 ns/op	      24 B/op	       2 allocs/op
+BenchmarkGenSyncPool_Get-24            	61883872	        18.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGenSyncPool_NewAlloc-24       	30189830	        40.73 ns/op	      16 B/op	       1 allocs/op
+BenchmarkGenSyncPool_BytesBuffer-24    	32870743	        33.46 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGenSyncPool_NullString-24     	61430223	        23.98 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGenSyncPool_NullInt64-24      	61229035	        21.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGenSyncPool_MD5-24            	 2275189	       486.7 ns/op	      24 B/op	       2 allocs/op
 PASS
-ok  	github.com/lbe/go-image-phash/internal/gensyncpool	10.249s
+ok  	github.com/lbe/go-image-phash/internal/gensyncpool	11.977s
 goos: linux
 goarch: amd64
 pkg: github.com/lbe/go-image-phash/phash
 cpu: Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz
-BenchmarkPHash_FromPath_Thumbnail-24    	    1112	   1039835 ns/op	   52040 B/op	      30 allocs/op
-BenchmarkPHash_FromPath_Full-24         	      31	  33434802 ns/op	 1111260 B/op	      34 allocs/op
-BenchmarkPHash_CachedSecondHash-24      	   74542	     16554 ns/op	    1089 B/op	       2 allocs/op
-BenchmarkHashFromDCT_8x8-24             	  245804	      4541 ns/op	    1361 B/op	      11 allocs/op
-BenchmarkHashFromLuminance_32-24        	    8108	    130591 ns/op	   18049 B/op	      14 allocs/op
+BenchmarkDistance-24                    	 4421888	       273.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkPHash_FromPath_Thumbnail-24    	     928	   1264446 ns/op	   52080 B/op	      30 allocs/op
+BenchmarkPHash_FromPath_Full-24         	      34	  30985866 ns/op	 1110038 B/op	      33 allocs/op
+BenchmarkPHash_CachedSecondHash-24      	   70551	     16861 ns/op	    1089 B/op	       2 allocs/op
+BenchmarkHashFromDCT_8x8-24             	  256723	      4549 ns/op	    1361 B/op	      11 allocs/op
+BenchmarkHashFromLuminance_32-24        	    8378	    129827 ns/op	   18047 B/op	      14 allocs/op
 PASS
-ok  	github.com/lbe/go-image-phash/phash	6.131s
+ok  	github.com/lbe/go-image-phash/phash	8.767s

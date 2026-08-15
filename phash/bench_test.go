@@ -2,6 +2,7 @@ package phash_test
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/lbe/go-image-phash/phash"
@@ -9,13 +10,40 @@ import (
 
 // Reference benchmark results (linux/amd64, Go 1.26.5, Intel Xeon E5-2680 v3):
 //
-//	BenchmarkPHash_FromPath_Thumbnail-24    	    1112	   1039835 ns/op	   52040 B/op	      30 allocs/op
-//	BenchmarkPHash_FromPath_Full-24         	      31	  33434802 ns/op	 1111260 B/op	      34 allocs/op
-//	BenchmarkPHash_CachedSecondHash-24      	   74542	     16554 ns/op	    1089 B/op	       2 allocs/op
-//	BenchmarkHashFromDCT_8x8-24             	  245804	      4541 ns/op	    1361 B/op	      11 allocs/op
-//	BenchmarkHashFromLuminance_32-24        	    8108	    130591 ns/op	   18049 B/op	      14 allocs/op
+//	BenchmarkPHash_FromPath_Thumbnail-24    	    1044	   1078129 ns/op	   52075 B/op	      30 allocs/op
+//	BenchmarkPHash_FromPath_Full-24         	      37	  36219086 ns/op	 1111184 B/op	      34 allocs/op
+//	BenchmarkPHash_CachedSecondHash-24      	   70164	     16920 ns/op	    1089 B/op	       2 allocs/op
+//	BenchmarkHashFromDCT_8x8-24             	  235736	      4688 ns/op	    1361 B/op	      11 allocs/op
+//	BenchmarkHashFromLuminance_32-24        	    8750	    127637 ns/op	   18047 B/op	      14 allocs/op
+//	BenchmarkDistance-24                    	 4395400	       241.3 ns/op	       0 B/op	       0 allocs/op
 //
-// Regenerate with: make bench-update (see docs/benchmarks.txt).
+// Regenerate with: make bench (see docs/benchmarks.txt).
+
+// distanceBenchA and distanceBenchB are fixed 64-bit hashes (hex
+// AAAAAAAAAAAAAAAA vs 0000000000000000).
+var (
+	distanceBenchA = phash.NewHash(strings.Repeat("1010", 16))
+	distanceBenchB = phash.NewHash(strings.Repeat("0000", 16))
+)
+
+// distanceSink keeps the benchmark loop observable so the compiler cannot
+// fold Distance away.
+var distanceSink int
+
+// BenchmarkDistance measures Hamming distance between two fixed 64-bit hashes.
+func BenchmarkDistance(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	s := 0
+	for i := 0; i < b.N; i++ {
+		d, err := phash.Distance(distanceBenchA, distanceBenchB)
+		if err != nil {
+			b.Fatal(err)
+		}
+		s += d
+	}
+	distanceSink = s
+}
 
 func benchExamplePath(b *testing.B, name string) string {
 	b.Helper()

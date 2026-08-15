@@ -21,8 +21,7 @@ help:
 	@echo "  make format-check  - Check formatting without writing"
 	@echo "  make lint          - Run golangci-lint"
 	@echo "  make cover         - Generate coverage report"
-	@echo "  make bench         - Run Go benchmarks (dct, gensyncpool, phash)"
-	@echo "  make bench-update  - Regenerate docs/benchmarks.txt from current toolchain"
+	@echo "  make bench         - Run Go benchmarks (dct, gensyncpool, phash); tee docs/benchmarks.txt"
 	@echo "  make test          - Run tests for $(PKG)"
 	@echo "  make test-all      - Run tests across all packages (incl. optional perl cross-check suite)"
 	@echo ""
@@ -56,12 +55,7 @@ cover:
 
 .PHONY: bench
 bench:
-	# Run package benchmarks. Pass ARGS for -count, -bench, etc.
-	go test -bench=. -benchmem -count=1 -run='^$$' $(BENCH_PKGS) $(ARGS)
-
-.PHONY: bench-update
-bench-update:
-	# Record benchmark output for the current Go toolchain into docs/benchmarks.txt
+	# Run package benchmarks; record to docs/benchmarks.txt and print (tee).
 	@{ \
 		echo "goos: $$(go env GOOS)"; \
 		echo "goarch: $$(go env GOARCH)"; \
@@ -70,9 +64,8 @@ bench-update:
 			echo "cpu: $$(grep -m1 'model name' /proc/cpuinfo | sed 's/.*: //')"; \
 		fi; \
 		echo; \
-		go test -bench=. -benchmem -count=1 -run='^$$' $(BENCH_PKGS); \
-	} > docs/benchmarks.txt
-	@echo "Wrote docs/benchmarks.txt"
+		go test -bench=. -benchmem -count=1 -run='^$$' $(BENCH_PKGS) $(ARGS); \
+	} 2>&1 | tee docs/benchmarks.txt
 
 .PHONY: build
 build:

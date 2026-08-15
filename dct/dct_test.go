@@ -487,7 +487,7 @@ func naive_dct2d(vector [][]float64) [][]float64 {
 //	BenchmarkDCT_2D_512-24    	      20	  51979128 ns/op	 4305892 B/op	    1028 allocs/op
 //	BenchmarkFDCT8_2D-24      	 2688633	       384.9 ns/op	       0 B/op	       0 allocs/op
 //
-// Regenerate with: make bench-update (see docs/benchmarks.txt).
+// Regenerate with: make bench (see docs/benchmarks.txt).
 
 func BenchmarkDCT_2D_3(b *testing.B) {
 	input := ary2d_flat[3]

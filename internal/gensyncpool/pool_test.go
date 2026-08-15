@@ -169,7 +169,7 @@ func TestResetOnPut(t *testing.T) {
 //	BenchmarkGenSyncPool_NullInt64-24      	46694926	        24.37 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkGenSyncPool_MD5-24            	 2124248	       557.3 ns/op	      24 B/op	       2 allocs/op
 //
-// Regenerate with: make bench-update (see docs/benchmarks.txt).
+// Regenerate with: make bench (see docs/benchmarks.txt).
 func BenchmarkGenSyncPool_Get(b *testing.B) {
 	pool := New(func() *testObj { return &testObj{} }, func(o *testObj) {
 		o.used = 0
